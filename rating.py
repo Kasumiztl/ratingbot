@@ -208,7 +208,7 @@ async def edit_user(message: types.Message):
         await message.answer("Использование: /edit_user @username новая роль @newusername")
         return
 
-    old_username, new_role, new_username = args[1], args[2], args[3]
+    old_username, new_role, new_username = args[1].lstrip("@"), args[2], args[3].lstrip("@")
     cur.execute("UPDATE users SET role=?, username=? WHERE username=?", (new_role, new_username, old_username))
     conn.commit()
 
@@ -227,7 +227,7 @@ async def remove_user(message: types.Message):
         await message.answer("Использование: /remove_user @username")
         return
 
-    username = args[1]
+    username = args[1].lstrip("@")
     cur.execute("DELETE FROM users WHERE username=?", (username,))
     conn.commit()
 
