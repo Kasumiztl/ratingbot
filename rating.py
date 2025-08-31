@@ -169,7 +169,7 @@ async def set_rating(message: Message):
 
     await message.answer(f"Рейтинг @{target_username} теперь {new_rating}/10 ")
 # --- Просмотр жалоб (для всех)
-@dp.message_handler(commands=['complaints'])
+@dp.message(Command('all_complaints'))
 async def all_complaints(message: types.Message):
     cur.execute("""
         SELECT u.username, u.role, c.reason, f.username, f.role
@@ -197,7 +197,7 @@ async def all_complaints(message: types.Message):
 
 
 # --- Редактирование участника (только админ)
-@dp.message_handler(commands=['edituser'])
+@dp.message(Command('edit_user'))
 async def edit_user(message: types.Message):
     if message.from_user.id != ADMIN_ID:
         await message.answer(" У тебя нет прав на эту команду")
@@ -216,7 +216,7 @@ async def edit_user(message: types.Message):
 
 
 # --- Удаление участника (только админ)
-@dp.message_handler(commands=['removeuser'])
+@dp.message(Command('remove_user'))
 async def remove_user(message: types.Message):
     if message.from_user.id != ADMIN_ID:
         await message.answer(" У тебя нет прав на эту команду")
