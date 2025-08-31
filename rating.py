@@ -168,6 +168,70 @@ async def set_rating(message: Message):
     conn.commit()
 
     await message.answer(f"Рейтинг @{target_username} теперь {new_rating}/10 ")
+# --- Просмотр жалоб (для всех)
+@dp.message_handler(commands=['complaints'])
+async def all_complaints(message: types.Message):
+    cur.execute("""
+        SELECT u.username, u.role, c.reason, f.username, f.role
+        FROM complaints c
+        JOIN users u ON u.user_id = c.to_user
+        JOIN users f ON f.user_id = c.from_user
+    """)
+    rows = cur.fetchall()
+    if not rows:
+        await message.answer("Жалоб пока нет")
+        return
+
+    text = ""
+    grouped = {}
+    for target_user, target_role, reason, from_user, from_role in rows:
+        key = f"@{target_user} ({target_role})"
+        if key not in grouped:
+            grouped[key] = []
+        grouped[key].append(f"- от @{from_user} ({from_role}): {reason}")
+
+    for target, complaints in grouped.items():
+        text += f"Жалобы на {target}:\n" + "\n".join(complaints) + "\n\n"
+
+    await message.answer(text)
+
+
+# --- Редактирование участника (только админ)
+@dp.message_handler(commands=['edituser'])
+async def edit_user(message: types.Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer(" У тебя нет прав на эту команду")
+        return
+
+    args = message.text.split(maxsplit=3)
+    if len(args) < 4:
+        await message.answer("Использование: /edituser @username новая роль @newusername")
+        return
+
+    old_username, new_role, new_username = args[1], args[2], args[3]
+    cur.execute("UPDATE users SET role=?, username=? WHERE username=?", (new_role, new_username, old_username))
+    conn.commit()
+
+    await message.answer(f"✅ Пользователь {old_username} обновлён: роль={new_role}, username={new_username}")
+
+
+# --- Удаление участника (только админ)
+@dp.message_handler(commands=['removeuser'])
+async def remove_user(message: types.Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer(" У тебя нет прав на эту команду")
+        return
+
+    args = message.text.split()
+    if len(args) < 2:
+        await message.answer("Использование: /removeuser @username")
+        return
+
+    username = args[1]
+    cur.execute("DELETE FROM users WHERE username=?", (username,))
+    conn.commit()
+
+    await message.answer(f"Участник {username} удалён из списка")
 
 # --- запуск ---
 async def main():
