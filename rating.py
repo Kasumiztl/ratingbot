@@ -91,7 +91,7 @@ async def complain(message: Message):
 
     target_id = result[0]
     cur.execute("INSERT INTO complaints (from_user, to_user, reason) VALUES (?, ?, ?)",
-                (message.target_id, reason))
+                (message.from_user.id, target_id, reason))
     conn.commit()
 
     await message.answer(f"Жалоба на @{target_username} отправлена")
@@ -118,7 +118,7 @@ async def show_complaints(message: Message):
     if not complaints:
         await message.answer(f"На @{target_username} ({role}) жалоб нет ")
     else:
-        text = "\n".join([f"- от {uid}: {reason}" for uid, reason in complaints])
+        text = "\n".join([f"-{reason}" for uid, reason in complaints])
         await message.answer(f"Жалобы на @{target_username} ({role}):\n{text}")
 
 # --- рейтинг конкретного игрока ---
@@ -188,7 +188,7 @@ async def all_complaints(message: types.Message):
         key = f"@{target_user} ({target_role})"
         if key not in grouped:
             grouped[key] = []
-        grouped[key].append(f"- от @{from_user} ({from_role}): {reason}")
+        grouped[key].append(f" {reason}")
 
     for target, complaints in grouped.items():
         text += f"Жалобы на {target}:\n" + "\n".join(complaints) + "\n\n"
