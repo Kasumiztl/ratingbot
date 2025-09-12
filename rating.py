@@ -5,13 +5,13 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram import F
 
-API_TOKEN = "8280767748:AAEx7IfdqqY8kLFJZWLvSQ7kgtyhQwop68Y"
-ADMIN_ID = 5594235882
+API_TOKEN = "8295445728:AAG6wYr6byvw8L4gKIOMaQQ0fci9zLm9pr8"
+ADMIN_ID = 18454022667
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-# --- база ---
+#база
 conn = sqlite3.connect("bot.db")
 cur = conn.cursor()
 
@@ -91,7 +91,7 @@ async def complain(message: Message):
 
     target_id = result[0]
     cur.execute("INSERT INTO complaints (from_user, to_user, reason) VALUES (?, ?, ?)",
-                (message.from_user.id, target_id, reason))
+                (message.target_id, reason))
     conn.commit()
 
     await message.answer(f"Жалоба на @{target_username} отправлена")
