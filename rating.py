@@ -6,7 +6,7 @@ from aiogram.types import Message
 from aiogram import F
 
 API_TOKEN = "8295445728:AAG6wYr6byvw8L4gKIOMaQQ0fci9zLm9pr8"
-ADMIN_ID = 18454022667
+ADMIN_ID = 1845402667
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
